@@ -1,0 +1,37 @@
+version: "3"
+
+include:
+  - proxy.yaml
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
+    restart: always
+    environment:
+      - DB_HOST=db
+      - DB_USER=netology
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=virtd
+
+  db:
+    image: mysql:8
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=virtd
+      - MYSQL_USER=netology
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
